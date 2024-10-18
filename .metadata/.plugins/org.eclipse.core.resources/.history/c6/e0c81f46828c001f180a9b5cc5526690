@@ -1,0 +1,38 @@
+package com.rule_engine_app.model;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class UserAttributes {
+    private Map<String, Object> attributes = new HashMap<>();
+
+    public void setAttribute(String key, Object value) {
+        attributes.put(key, value);
+    }
+
+    public Object getAttributeValue(String key) {
+        return attributes.get(key);
+    }
+
+    public Integer getAge() {
+        return (Integer) attributes.get("age");
+    }
+
+    public String getDepartment() {
+        return (String) attributes.get("department");
+    }
+
+    public Double getIncome() {
+        return (Double) attributes.get("income");
+    }
+
+    public Integer getExperience() {
+        return (Integer) attributes.get("experience");
+    }
+
+    public Double getSpend() {
+        return (Double) attributes.get("spend");
+    }
+}
+

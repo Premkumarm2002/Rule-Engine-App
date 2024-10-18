@@ -1,0 +1,59 @@
+package com.rule_engine_app.ast;
+
+import com.rule_engine_app.model.UserAttributes;
+
+public class ConditionNode extends Node {
+    private String attribute;
+    private String operator;
+    private String value;
+
+    public ConditionNode(String attribute, String operator, String value) {
+        this.attribute = attribute;
+        this.operator = operator;
+        this.value = value;
+    }
+
+    @Override
+    public boolean evaluate(UserAttributes attributes) {
+        switch (attribute) {
+            case "age":
+                return evaluateCondition(attributes.getAge(), operator, Integer.parseInt(value));
+            case "income":
+                return evaluateCondition(attributes.getIncome(), operator, Integer.parseInt(value));
+            case "experience":
+                return evaluateCondition(attributes.getExperience(), operator, Integer.parseInt(value));
+            case "spend":
+                return evaluateCondition(attributes.getSpend(), operator, Integer.parseInt(value));
+            case "department":
+                return evaluateStringCondition(attributes.getDepartment(), operator, value);
+            default:
+                throw new UnsupportedOperationException("Attribute not supported: " + attribute);
+        }
+    }
+
+    private boolean evaluateCondition(int attributeValue, String operator, int value) {
+        switch (operator) {
+            case ">":
+                return attributeValue > value;
+            case ">=":
+                return attributeValue >= value;
+            case "<":
+                return attributeValue < value;
+            case "=":
+                return attributeValue == value;
+            default:
+                throw new IllegalArgumentException("Invalid operator: " + operator);
+        }
+    }
+
+    private boolean evaluateStringCondition(String attributeValue, String operator, String value) {
+        switch (operator) {
+            case "=":
+                return attributeValue.equals(value);
+            case "is":
+                return attributeValue.equalsIgnoreCase(value);
+            default:
+                throw new IllegalArgumentException("Invalid operator for string: " + operator);
+        }
+    }
+}

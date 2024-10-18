@@ -1,0 +1,5 @@
+package com.rule_engine_app.ast;
+
+public interface Node {
+    boolean evaluate(UserAttributes attributes);
+}

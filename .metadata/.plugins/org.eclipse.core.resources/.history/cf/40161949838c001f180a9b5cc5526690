@@ -1,0 +1,108 @@
+package com.rule_engine_app.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.rule_engine_app.ast.ConditionNode;
+import com.rule_engine_app.ast.Node;
+import com.rule_engine_app.ast.OperatorNode;
+import com.rule_engine_app.model.Rule;
+import com.rule_engine_app.model.UserAttributes;
+import com.rule_engine_app.repository.RuleRepository;
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Service
+public class RuleEngineService {
+
+    @Autowired
+    private RuleRepository ruleRepository;
+
+    public Node createRule(String ruleString) {
+        return parseExpression(ruleString);
+    }
+
+    private Node parseExpression(String expression) {
+        expression = expression.trim();
+        if (expression.startsWith("(") && expression.endsWith(")")) {
+            expression = expression.substring(1, expression.length() - 1).trim();
+        }
+
+        String[] orParts = expression.split("OR");
+        List<Node> orNodes = new ArrayList<>();
+
+        for (String orPart : orParts) {
+            orNodes.add(parseAndExpression(orPart.trim()));
+        }
+
+        if (orNodes.size() > 1) {
+            return new OperatorNode("OR", orNodes.get(0), combineOrNodes(orNodes.subList(1, orNodes.size())));
+        } else {
+            return orNodes.get(0);
+        }
+    }
+
+    private Node combineOrNodes(List<Node> nodes) {
+        Node combinedNode = nodes.get(0);
+        for (int i = 1; i < nodes.size(); i++) {
+            combinedNode = new OperatorNode("OR", combinedNode, nodes.get(i));
+        }
+        return combinedNode;
+    }
+
+    private Node parseAndExpression(String expression) {
+        String[] andParts = expression.split("AND");
+        List<Node> andNodes = new ArrayList<>();
+
+        for (String andPart : andParts) {
+            andNodes.add(parseCondition(andPart.trim()));
+        }
+
+        if (andNodes.size() > 1) {
+            Node combinedNode = andNodes.get(0);
+            for (int i = 1; i < andNodes.size(); i++) {
+                combinedNode = new OperatorNode("AND", combinedNode, andNodes.get(i));
+            }
+            return combinedNode;
+        } else {
+            return andNodes.get(0);
+        }
+    }
+
+    private Node parseCondition(String condition) {
+        String[] tokens = condition.split(" ");
+        if (tokens.length != 3) {
+            throw new IllegalArgumentException("Invalid condition: " + condition);
+        }
+        String attribute = tokens[0];
+        String operator = tokens[1];
+        String value = tokens[2].replace("'", ""); // Remove quotes for string values
+        return new ConditionNode(attribute, operator, value);
+    }
+
+    public Node combineRules(List<Node> rules) {
+        if (rules.isEmpty()) {
+            return null;
+        }
+        Node root = rules.get(0);
+        for (int i = 1; i < rules.size(); i++) {
+            root = new OperatorNode("AND", root, rules.get(i));
+        }
+        return root;
+    }
+
+    public boolean evaluateRule(Node rule, UserAttributes attributes) {
+        return rule.evaluate(attributes);
+    }
+
+    public Rule saveRule(String ruleString) {
+        Rule rule = new Rule();
+        rule.setRuleString(ruleString);
+        return ruleRepository.save(rule);
+    }
+
+    public List<Rule> getAllRules() {
+        return ruleRepository.findAll();
+    }
+}
+

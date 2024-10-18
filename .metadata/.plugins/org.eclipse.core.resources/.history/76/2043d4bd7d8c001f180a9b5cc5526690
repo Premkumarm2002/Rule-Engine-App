@@ -1,0 +1,49 @@
+package com.rule_engine_app.ast;
+
+import com.rule_engine_app.model.UserAttributes;
+
+
+
+class ConditionNode extends Node {
+    private String attribute;
+    private String operator;
+    private String value;
+
+    public ConditionNode(String attribute, String operator, String value) {
+        this.attribute = attribute;
+        this.operator = operator;
+        this.value = value;
+    }
+
+    @Override
+    public boolean evaluate(UserAttributes attributes) {
+        switch (attribute) {
+            case "age":
+                return compare((Integer) attributes.getAge(), operator, Integer.parseInt(value));
+            case "department":
+                return attributes.getDepartment().equals(value);
+            case "income":
+                return compare((Double) attributes.getIncome(), operator, Double.parseDouble(value));
+            case "experience":
+                return compare((Integer) attributes.getExperience(), operator, Integer.parseInt(value));
+            case "spend":
+                return compare((Double) attributes.getSpend(), operator, Double.parseDouble(value));
+            default:
+                throw new UnsupportedOperationException("Attribute not supported: " + attribute);
+        }
+    }
+
+    private boolean compare(Comparable a, String operator, Comparable b) {
+        switch (operator) {
+            case ">":
+                return a.compareTo(b) > 0;
+            case "<":
+                return a.compareTo(b) < 0;
+            case "=":
+                return a.compareTo(b) == 0;
+            // Add other operators as needed
+            default:
+                throw new UnsupportedOperationException("Operator not supported: " + operator);
+        }
+    }
+}

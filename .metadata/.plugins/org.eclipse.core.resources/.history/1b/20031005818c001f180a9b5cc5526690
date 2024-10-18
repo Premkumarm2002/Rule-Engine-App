@@ -1,0 +1,67 @@
+package com.rule_engine_app.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.rule_engine_app.ast.ConditionNode;
+import com.rule_engine_app.ast.Node;
+import com.rule_engine_app.ast.OperatorNode;
+import com.rule_engine_app.model.Rule;
+import com.rule_engine_app.model.UserAttributes;
+import com.rule_engine_app.repository.RuleRepository;
+import java.util.List;
+
+@Service
+public class RuleEngineService {
+
+    @Autowired
+    private RuleRepository ruleRepository;
+
+    public Node createRule(String ruleString) {
+        // A simple parser to create a rule tree
+        if (ruleString.contains("AND")) {
+            String[] parts = ruleString.split("AND");
+            Node left = parseCondition(parts[0].trim());
+            Node right = parseCondition(parts[1].trim());
+            return new OperatorNode("AND", left, right);
+        } else if (ruleString.contains("OR")) {
+            String[] parts = ruleString.split("OR");
+            Node left = parseCondition(parts[0].trim());
+            Node right = parseCondition(parts[1].trim());
+            return new OperatorNode("OR", left, right);
+        }
+        return parseCondition(ruleString);
+    }
+
+    private Node parseCondition(String condition) {
+        String[] tokens = condition.split(" ");
+        String attribute = tokens[0];
+        String operator = tokens[1];
+        String value = tokens[2].replace("'", ""); // Remove quotes for string values
+        return new ConditionNode(attribute, operator, value);
+    }
+
+    public Node combineRules(List<Node> rules) {
+        if (rules.isEmpty()) {
+            return null;
+        }
+        Node root = rules.get(0);
+        for (int i = 1; i < rules.size(); i++) {
+            root = new OperatorNode("AND", root, rules.get(i));
+        }
+        return root;
+    }
+
+    public boolean evaluateRule(Node rule, UserAttributes attributes) {
+        return rule.evaluate(attributes);
+    }
+
+    public Rule saveRule(String ruleString) {
+        Rule rule = new Rule();
+        rule.setRuleString(ruleString);
+        return ruleRepository.save(rule);
+    }
+
+    public List<Rule> getAllRules() {
+        return ruleRepository.findAll();
+    }
+}

@@ -1,0 +1,26 @@
+package com.rule_engine_app.ast;
+
+public class ConditionNode implements Node{
+	private String attribute;
+    private String operator;
+    private String value;
+
+    public ConditionNode(String attribute, String operator, String value) {
+        this.attribute = attribute;
+        this.operator = operator;
+        this.value = value;
+    }
+    @Override
+    public boolean evaluate(UserAttributes attributes) {
+        switch (operator) {
+            case ">":
+                return (int) attributes.get(attribute) > Integer.parseInt(value);
+            case "<":
+                return (int) attributes.get(attribute) < Integer.parseInt(value);
+            case "=":
+                return attributes.get(attribute).equals(value);
+            default:
+                throw new UnsupportedOperationException("Unsupported operator: " + operator);
+        }
+    }
+}

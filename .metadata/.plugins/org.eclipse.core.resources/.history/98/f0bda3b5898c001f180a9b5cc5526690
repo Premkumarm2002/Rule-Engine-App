@@ -1,0 +1,125 @@
+package com.rule_engine_app.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.rule_engine_app.ast.ConditionNode;
+import com.rule_engine_app.ast.Node;
+import com.rule_engine_app.ast.OperatorNode;
+import com.rule_engine_app.model.Rule;
+import com.rule_engine_app.model.UserAttributes;
+import com.rule_engine_app.repository.RuleRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class RuleEngineService {
+
+    @Autowired
+    private RuleRepository ruleRepository;
+
+    public Node createRule(String ruleString) {
+        return parseExpression(ruleString);
+    }
+
+    private Node parseExpression(String expression) {
+        expression = expression.trim();
+
+        // Remove outer parentheses if they exist
+        while (expression.startsWith("(") && expression.endsWith(")")) {
+            expression = expression.substring(1, expression.length() - 1).trim();
+        }
+
+        String[] orParts = expression.split("\\s+OR\\s+");
+        List<Node> orNodes = new ArrayList<>();
+
+        for (String orPart : orParts) {
+            orNodes.add(parseAndExpression(orPart.trim()));
+        }
+
+        return combineOrNodes(orNodes);
+    }
+
+    private Node combineOrNodes(List<Node> nodes) {
+        if (nodes.size() == 1) {
+            return nodes.get(0);
+        }
+
+        Node combinedNode = nodes.get(0);
+        for (int i = 1; i < nodes.size(); i++) {
+            combinedNode = new OperatorNode("OR", combinedNode, nodes.get(i));
+        }
+        return combinedNode;
+    }
+
+    private Node parseAndExpression(String expression) {
+        String[] andParts = expression.split("\\s+AND\\s+");
+        List<Node> andNodes = new ArrayList<>();
+
+        for (String andPart : andParts) {
+            andNodes.add(parseCondition(andPart.trim()));
+        }
+
+        return combineAndNodes(andNodes);
+    }
+
+    private Node combineAndNodes(List<Node> nodes) {
+        if (nodes.size() == 1) {
+            return nodes.get(0);
+        }
+
+        Node combinedNode = nodes.get(0);
+        for (int i = 1; i < nodes.size(); i++) {
+            combinedNode = new OperatorNode("AND", combinedNode, nodes.get(i));
+        }
+        return combinedNode;
+    }
+
+    private Node parseCondition(String condition) {
+        String[] tokens = condition.split("\\s+");
+        if (tokens.length != 3) {
+            throw new IllegalArgumentException("Invalid condition: " + condition);
+        }
+
+        String attribute = tokens[0].trim();
+        String operator = tokens[1].trim();
+        String value = tokens[2].replace("'", "").trim(); // Remove quotes for string values
+
+        // Check for additional operators
+        if (operator.equals("is")) {
+            return new ConditionNode(attribute, operator, value);
+        }
+
+        return new ConditionNode(attribute, operator, value);
+    }
+    public boolean evaluateRule(Node rule, UserAttributes attributes) {
+        boolean mandatoryConditions = evaluateMandatoryConditions(attributes);
+        boolean optionalConditions = evaluateOptionalConditions(rule, attributes);
+        return mandatoryConditions && optionalConditions;
+    }
+
+    private boolean evaluateMandatoryConditions(UserAttributes attributes) {
+        return attributes.getAge() > 22 && attributes.getExperience() >= 0;
+    }
+
+    private boolean evaluateOptionalConditions(UserAttributes attributes) {
+        // Check each optional condition
+        boolean incomeCondition = attributes.getIncome() > 25000;
+        boolean departmentCondition = "IT".equals(attributes.getDepartment());
+        boolean spendCondition = attributes.getSpend() > 1000;
+
+        // Return true if any optional condition is true
+        return incomeCondition || departmentCondition || spendCondition;
+    }
+
+
+    public Rule saveRule(String ruleString) {
+        Rule rule = new Rule();
+        rule.setRuleString(ruleString);
+        return ruleRepository.save(rule);
+    }
+
+    public List<Rule> getAllRules() {
+        return ruleRepository.findAll();
+    }
+}

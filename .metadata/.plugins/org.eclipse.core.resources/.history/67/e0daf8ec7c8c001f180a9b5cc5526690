@@ -1,0 +1,60 @@
+package com.rule_engine_app.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.rule_engine_app.ast.ConditionNode;
+import com.rule_engine_app.ast.Node;
+import com.rule_engine_app.ast.OperatorNode;
+import com.rule_engine_app.model.Rule;
+import com.rule_engine_app.model.UserAttributes;
+import com.rule_engine_app.repository.RuleRepository;
+import java.util.List;
+
+
+@Service
+public class RuleEngineService {
+
+    @Autowired
+    private RuleRepository ruleRepository;
+
+    public Node createRule(String ruleString) {
+        // Basic parser for demonstration
+        if (ruleString.contains("AND")) {
+            return new OperatorNode("AND",
+                    new ConditionNode("age", ">", "30"),
+                    new ConditionNode("department", "=", "Sales"));
+        } else if (ruleString.contains("OR")) {
+            return new OperatorNode("OR",
+                    new ConditionNode("income", ">", "50000"),
+                    new ConditionNode("experience", ">", "5"));
+        }
+        return null;
+    }
+
+    public Node combineRules(List<Node> rules) {
+        if (rules.isEmpty()) {
+            return null;
+        }
+        Node root = rules.get(0);
+        for (int i = 1; i < rules.size(); i++) {
+            root = new OperatorNode("AND", root, rules.get(i));
+        }
+        return root;
+    }
+
+    public boolean evaluateRule(Node rule, UserAttributes attributes) {
+        return rule.evaluate(attributes);
+    }
+
+    public Rule saveRule(String ruleString) {
+        Rule rule = new Rule();
+        rule.setRuleString(ruleString);
+        return ruleRepository.save(rule);
+    }
+
+    public List<Rule> getAllRules() {
+        return ruleRepository.findAll();
+    }
+}
+
+
