@@ -27,6 +27,7 @@ Rule-Engine-App/
 Rule Engine with AST enables dynamic rule creation and evaluation based on user attributes like age, department, and income. Built with Java and Spring Boot, it features
 a RESTful API and uses MySQL for storage. The application handles complex logical expressions efficiently, providing flexibility for eligibility determinations across 
 various applications.
+
 Rule Engine with AST
 Description
 This Rule Engine application allows for dynamic rule creation and evaluation based on user attributes such as age, department, income, and spending. Utilizing an 
@@ -35,6 +36,7 @@ Abstract Syntax Tree (AST), the application offers a flexible approach to manage
 Features
 Dynamic Rule Management: Create and evaluate rules using a simple syntax.
 RESTful API: Access endpoints for rule management and evaluation.
+
 MySQL Database: Persistent storage for rules.
 Technologies Used
 Java
@@ -55,6 +57,7 @@ Configure MySQL:
 
 Create a database named rule_engine_db.
 Update the application.properties file with your MySQL credentials.
+
 Build the Application:
 
 mvn clean install
