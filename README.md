@@ -48,36 +48,46 @@ Installation
 
 Clone the Repository:
 git clone https://github.com/Premkumarm2002/Rule-Engine-App.git
+
 cd Rule-Engine-App
+
 Configure MySQL:
 
 Create a database named rule_engine_db.
+
 Update the application.properties file with your MySQL credentials.
 
 Build the Application:
 
 mvn clean install
+
 Run the Application:
 
 mvn spring-boot:run
-API Endpoints
-Create Rule
 
-Method: POST
+API Endpoints
+
+Create Rule:
+
+Method: POST, 
 URL: /api/rules/create
+
 Request Body:
 json
 {
   "ruleString": "age > 30 AND department = 'Sales'"
 }
-Get All Rules
 
-Method: GET
+Get All Rules:
+
+Method: GET, 
 URL: /api/rules/all
-Evaluate Rule
 
-Method: POST
+Evaluate Rule:
+
+Method: POST, 
 URL: /api/rules/evaluate
+
 Request Body:
 json
 {
@@ -87,6 +97,7 @@ json
   "experience": 3,
   "spend": 500
 }
-Testing
+
+Testing:
 Use Postman or any REST client to test the API endpoints.
 
