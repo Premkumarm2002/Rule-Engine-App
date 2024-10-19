@@ -1,3 +1,10 @@
+# Rule-Engine-App
+Rule Engine with AST enables dynamic rule creation and evaluation based on user attributes like age, department, and income. Built with Java and Spring Boot, it features a RESTful API and uses MySQL for storage. The application handles complex logical expressions efficiently, providing flexibility for eligibility determinations across various applications.
+
+Rule Engine with AST
+Description:
+This Rule Engine application allows for dynamic rule creation and evaluation based on user attributes such as age, department, income, and spending. Utilizing an Abstract Syntax Tree (AST), the application offers a flexible approach to manage complex logical expressions efficiently.
+
 Project Structure
 I organized the project in a structured manner, which is as follows:
 
@@ -22,17 +29,6 @@ Rule-Engine-App/
 └── pom.xml
 
 ```
-
-# Rule-Engine-App
-Rule Engine with AST enables dynamic rule creation and evaluation based on user attributes like age, department, and income. Built with Java and Spring Boot, it features
-a RESTful API and uses MySQL for storage. The application handles complex logical expressions efficiently, providing flexibility for eligibility determinations across 
-various applications.
-
-Rule Engine with AST
-Description
-This Rule Engine application allows for dynamic rule creation and evaluation based on user attributes such as age, department, income, and spending. Utilizing an 
-Abstract Syntax Tree (AST), the application offers a flexible approach to manage complex logical expressions efficiently.
-
 Features
 Dynamic Rule Management: Create and evaluate rules using a simple syntax.
 RESTful API: Access endpoints for rule management and evaluation.
@@ -51,7 +47,7 @@ Maven
 Installation
 
 Clone the Repository:
-git clone https://github.com/yourusername/Rule-Engine-App.git
+git clone https://github.com/Premkumarm2002/Rule-Engine-App.git
 cd Rule-Engine-App
 Configure MySQL:
 
@@ -71,7 +67,6 @@ Method: POST
 URL: /api/rules/create
 Request Body:
 json
-Copy code
 {
   "ruleString": "age > 30 AND department = 'Sales'"
 }
